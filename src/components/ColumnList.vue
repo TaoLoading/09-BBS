@@ -1,23 +1,12 @@
 <template>
   <div class="row">
-    <div
-      v-for="column in columnList"
-      :key="column.id"
-      class="col-4 mb-4"
-    >
+    <div v-for="column in columnList" :key="column.id" class="col-4 mb-4">
       <div class="card h-100 shadow-sm">
         <div class="card-body text-center">
-          <img
-            :src="column.avatar"
-            :alt="column.title"
-            class="rounded-circle border border-light w-25 my-3"
-          >
-          <h5 class="card-title">{{column.title}}</h5>
-          <p class="card-text text-left">{{column.description}}</p>
-          <a
-            href="#"
-            class="btn btn-outline-primary"
-          >进入专栏</a>
+          <img :src="column.avatar" :alt="column.title" class="rounded-circle border border-light w-25 my-3" />
+          <h5 class="card-title">{{ column.title }}</h5>
+          <p class="card-text text-left">{{ column.description }}</p>
+          <a href="#" class="btn btn-outline-primary">进入专栏</a>
         </div>
       </div>
     </div>
@@ -44,7 +33,7 @@ export default defineComponent({
   setup(props) {
     // 当没有头像时显示默认头像
     const columnList = computed(() => {
-      return props.list.map((column) => {
+      return props.list.map(column => {
         if (!column.avatar) {
           column.avatar = require('@/assets/avatar.jpg')
         }
@@ -58,5 +47,4 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
