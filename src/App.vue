@@ -79,7 +79,7 @@ export default defineComponent({
     ]
     const inputRef = ref<any>()
     const onFormSubmit = (result:boolean) => {
-      console.log('提交成功', inputRef.value.validateInput())
+      console.log('发起提交', inputRef.value.validateInput())
       // console.log('提交成功', result)
     }
     return {
