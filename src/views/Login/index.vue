@@ -8,7 +8,6 @@
           :rules="emailRules" v-model="emailData"
           placeholder="请输入邮箱地址"
           type="text"
-          ref="inputRef"
         />
       </div>
       <div class="mb-3">
@@ -29,6 +28,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ValidateInput, { RulesProp } from '../../components/ValidateInput.vue'
 import ValidateForm from '../../components/ValidateForm.vue'
 export default defineComponent({
@@ -44,6 +44,7 @@ export default defineComponent({
     const emailData = ref('Taoloading@taoloading.com')
     // 密码模拟数据
     const passwordData = ref('123123')
+    const router = useRouter()
     const emailRules: RulesProp = [
       { type: 'required', message: '邮箱地址不能为空' },
       { type: 'email', message: '请输入正确的邮箱' }
@@ -51,9 +52,10 @@ export default defineComponent({
     const passwordRules: RulesProp = [
       { type: 'required', message: '密码不能为空' }
     ]
-    const inputRef = ref<any>()
-    const onFormSubmit = () => {
-      console.log('发起提交', inputRef.value.validateInput())
+    const onFormSubmit = (result:boolean) => {
+      if (result) {
+        router.push({ name: 'column', params: { id: 1 } })
+      }
     }
     return {
       emailRules,

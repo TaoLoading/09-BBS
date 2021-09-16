@@ -1,6 +1,7 @@
 <template>
   <nav class="navbar navbar-dark bg-primary justify-content-between mb-4 px-4">
-    <a href="#" class="navbar-brand">BBS</a>
+    <!-- <a href="#" class="navbar-brand">BBS</a> -->
+    <router-link to="/" class="navbar-brand">BBS</router-link>
     <ul v-if="!user.isLogin" class="list-inline mb-0">
       <li class="list-inline-item">
         <a href="#" class="btn btn-outline-light my-2">登陆</a>
