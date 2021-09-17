@@ -32,7 +32,7 @@ const store = createStore({
   state: {
     columns: testData,
     posts: testPosts,
-    user: { isLogin: false, name: '', columnId: 1 }
+    user: { isLogin: true, name: 'TaoLoading', columnId: 1 }
   },
   mutations: {
     login(state) {
