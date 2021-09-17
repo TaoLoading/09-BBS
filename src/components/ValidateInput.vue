@@ -1,7 +1,9 @@
 <template>
     <div class="validate-input-container pb-3">
-      <input class="form-control" :value="inputRef.val"
-             @input="updateValue" @blur="validateInput" :class="{'is-invalid': inputRef.error}" v-bind="$attrs">
+      <input v-if="tag!='textarea'" class="form-control" :value="inputRef.val"
+        @input="updateValue" @blur="validateInput" :class="{'is-invalid': inputRef.error}" v-bind="$attrs">
+      <textarea v-else class="form-control" :value="inputRef.val"
+        @input="updateValue" @blur="validateInput" :class="{'is-invalid': inputRef.error}" v-bind="$attrs"></textarea>
       <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
     </div>
 </template>
@@ -16,12 +18,19 @@ interface RuleProp {
   message: string
 }
 export type RulesProp = RuleProp[]
+export type TagType = 'input' | 'textarea'
 export default defineComponent({
   name: 'ValidateInput',
   props: {
     rules: Array as PropType<RulesProp>,
-    modelValue: String
+    modelValue: String,
+    // 用于确定传入输入框的类型
+    tag: {
+      type: String as PropType<TagType>,
+      default: 'input'
+    }
   },
+  // inheritAttrs: false禁用继承，与v-bind="$attrs"配合实现修改继承位置
   inheritAttrs: false,
   setup(props, context) {
     const inputRef = reactive({
