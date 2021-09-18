@@ -1,5 +1,6 @@
-import Axios from 'axios'
-import { createStore } from 'vuex'
+import axios from 'axios'
+import { createStore, Commit } from 'vuex'
+// import { testData, testPosts } from '../testData'
 
 export interface ImageProps {
   _id?: string;
@@ -19,26 +20,33 @@ export interface PostProps {
   excerpt?:string;
   image?: ImageProps;
   createdAt: string;
-  columnId: string;
+  column: string;
 }
 export interface UserProps {
   isLogin: boolean
   name?: string
   id?: number
-  columnId?: string
+  column?: string
   email?: string
   description?: string
 }
 export interface GlobalDataProps {
+  loading:boolean
   columns: ColumnProps[]
   posts: PostProps[]
   user: UserProps
 }
+// 提交请求函数
+const getAndCommit = async (url:string, mutationName:string, commit:Commit) => {
+  const { data } = await axios.get(url)
+  commit(mutationName, data)
+}
 const store = createStore<GlobalDataProps>({
   state: {
+    loading: false,
     columns: [],
     posts: [],
-    user: { isLogin: true, name: 'TaoLoading', columnId: '1' }
+    user: { isLogin: true, name: 'TaoLoading', column: '1' }
   },
   mutations: {
     // 登录
@@ -57,27 +65,31 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts(state, newData) {
       state.posts = newData.data.list
-      console.log('新的posts是', state.posts)
+    },
+    setLoading(state, status) {
+      state.loading = status
     }
   },
   actions: {
     // 获取首页“发现精彩”内容
     fetchColumns({ commit }) {
-      Axios.get('/columns').then(res => {
-        commit('fetchColumns', res.data)
-      })
+      getAndCommit('/columns', 'fetchColumns', commit)
     },
     // 获取专栏页头部内容
-    fetchColumn({ commit }, pid) {
-      Axios.get(`/columns/${pid}`).then(res => {
-        commit('fetchColumn', res.data)
-      })
+    fetchColumn({ commit }, cid) {
+      getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
     },
     // 获取专栏页文章内容
-    fetchPosts({ commit }, pid) {
-      Axios.get(`/columns/${pid}/posts`).then(res => {
-        commit('fetchPosts', res.data)
-      })
+    fetchPosts({ commit }, cid) {
+      getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+    }
+  },
+  getters: {
+    getColumnById: (state) => (id: string) => {
+      return state.columns.find(c => c._id === id)
+    },
+    getPostsByCid: (state) => (cid: string) => {
+      return state.posts.filter(post => post.column === cid)
     }
   }
 })
