@@ -29,7 +29,7 @@ export default defineComponent({
     // 将专栏与文章ID对应
     const currentId = route.params.id
     onMounted(() => {
-      // store.dispatch('fetchColumn', currentId)
+      store.dispatch('fetchColumn', currentId)
       store.dispatch('fetchPosts', currentId)
     })
     // const column = store.state.columns.find(c => c._id === currentId)

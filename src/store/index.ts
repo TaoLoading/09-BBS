@@ -3,24 +3,24 @@ import { createStore, Commit } from 'vuex'
 // import { testData, testPosts } from '../testData'
 
 export interface ImageProps {
-  _id?: string;
-  url?: string;
-  createdAt?: string;
+  _id?: string
+  url?: string
+  createdAt?: string
 }
 export interface ColumnProps {
-  _id?: string;
-  title: string;
-  avatar?: ImageProps;
-  description: string;
+  _id?: string
+  title: string
+  avatar?: ImageProps
+  description: string
 }
 export interface PostProps {
-  _id: string;
-  title: string;
-  content?: string;
-  excerpt?:string;
-  image?: ImageProps;
-  createdAt: string;
-  column: string;
+  _id: string
+  title: string
+  content?: string
+  excerpt?: string
+  image?: ImageProps
+  createdAt: string
+  column: string
 }
 export interface UserProps {
   isLogin: boolean
@@ -31,27 +31,35 @@ export interface UserProps {
   description?: string
 }
 export interface GlobalDataProps {
-  loading:boolean
+  token: string
+  loading: boolean
   columns: ColumnProps[]
   posts: PostProps[]
   user: UserProps
 }
-// 提交请求函数
+// get请求函数
 const getAndCommit = async (url:string, mutationName:string, commit:Commit) => {
   const { data } = await axios.get(url)
   commit(mutationName, data)
 }
+// post请求函数
+const postAndCommit = async (url:string, mutationName:string, commit:Commit, params:any) => {
+  const { data } = await axios.post(url, params)
+  commit(mutationName, data)
+  return data
+}
 const store = createStore<GlobalDataProps>({
   state: {
+    token: '',
     loading: false,
     columns: [],
     posts: [],
-    user: { isLogin: true, name: 'TaoLoading', column: '1' }
+    user: { isLogin: false, name: 'TaoLoading', column: '1' }
   },
   mutations: {
     // 登录
-    login(state) {
-      state.user = { ...state.user, isLogin: true, name: 'TaoLoading' }
+    login(state, newData) {
+      state.token = newData.data.token
     },
     // 新建文章
     createPost(state, newPost) {
@@ -71,6 +79,10 @@ const store = createStore<GlobalDataProps>({
     }
   },
   actions: {
+    // 登录
+    login({ commit }, params) {
+      return postAndCommit('/user/login', 'login', commit, params)
+    },
     // 获取首页“发现精彩”内容
     fetchColumns({ commit }) {
       getAndCommit('/columns', 'fetchColumns', commit)

@@ -34,9 +34,9 @@ export default defineComponent({
   setup() {
     const store = useStore()
     // 邮箱模拟数据
-    const emailData = ref('Taoloading@taoloading.com')
+    const emailData = ref('111@test.com')
     // 密码模拟数据
-    const passwordData = ref('123123')
+    const passwordData = ref('111111')
     const router = useRouter()
     const emailRules: RulesProp = [
       { type: 'required', message: '邮箱地址不能为空' },
@@ -48,8 +48,17 @@ export default defineComponent({
     // 提交登录信息
     const onFormSubmit = (result:boolean) => {
       if (result) {
-        router.push('/')
-        store.commit('login')
+        const params = {
+          email: emailData.value,
+          password: passwordData.value,
+          icode: '15A7028B2AE56E27'
+        }
+        store.dispatch('login', params).then(data => {
+          console.log('返回的token是', data.data.token)
+          router.push('/')
+        }).catch(() => {
+          console.log('登陆失败')
+        })
       }
     }
     return {
