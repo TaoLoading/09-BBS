@@ -14,11 +14,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, onMounted, watch } from 'vue'
+import { useStore } from 'vuex'
+import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import GlobalHeader from './components/GolbalHeader.vue'
 import Loading from './components/Loading.vue'
-import { useStore } from 'vuex'
+import { GlobalDataProps } from './store/index'
+import createMessage from './components/createMessage'
 
 export default defineComponent({
   name: 'App',
@@ -27,12 +30,29 @@ export default defineComponent({
     Loading
   },
   setup() {
-    const store = useStore()
+    const store = useStore<GlobalDataProps>()
     const userData = computed(() => store.state.user)
     const isLoading = computed(() => store.state.loading)
+    const token = computed(() => store.state.token)
+    const error = computed(() => store.state.error)
+    onMounted(() => {
+      // 当用户未进行登陆操作并且token存在时，发起请求获取用户信息
+      if (!userData.value.isLogin && token.value) {
+        axios.defaults.headers.common.Authorization = `Bearer ${token.value}`
+        store.dispatch('fetchCurrentUser')
+      }
+    })
+    // 监视error状态，并根据错误值进行提示
+    watch(() => error.value.status, () => {
+      const { status, message } = error.value
+      if (status && message) {
+        createMessage(message, 'error')
+      }
+    })
     return {
       userData,
-      isLoading
+      isLoading,
+      error
     }
   }
 })

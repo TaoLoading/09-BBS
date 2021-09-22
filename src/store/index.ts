@@ -24,13 +24,18 @@ export interface PostProps {
 }
 export interface UserProps {
   isLogin: boolean
-  name?: string
-  id?: number
+  nickName?: string
+  _id?: string
   column?: string
   email?: string
   description?: string
 }
+export interface GlobalErrorProps {
+  status: boolean
+  message?: string
+}
 export interface GlobalDataProps {
+  error:GlobalErrorProps
   token: string
   loading: boolean
   columns: ColumnProps[]
@@ -50,16 +55,21 @@ const postAndCommit = async (url:string, mutationName:string, commit:Commit, par
 }
 const store = createStore<GlobalDataProps>({
   state: {
-    token: '',
+    error: { status: false },
+    token: localStorage.getItem('token') || '',
     loading: false,
     columns: [],
     posts: [],
-    user: { isLogin: false, name: 'TaoLoading', column: '1' }
+    user: { isLogin: false }
   },
   mutations: {
     // 登录
     login(state, newData) {
-      state.token = newData.data.token
+      const { token } = newData.data
+      state.token = token
+      localStorage.setItem('token', token)
+      // 设置请求头，每次请求都在Authorization中携带token
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
     },
     // 新建文章
     createPost(state, newPost) {
@@ -74,8 +84,16 @@ const store = createStore<GlobalDataProps>({
     fetchPosts(state, newData) {
       state.posts = newData.data.list
     },
+    // 设置loading
     setLoading(state, status) {
       state.loading = status
+    },
+    fetchCurrentUser(state, newData) {
+      state.user = { isLogin: true, ...newData.data }
+    },
+    // 修改错误状态
+    setError(state, e:GlobalErrorProps) {
+      state.error = e
     }
   },
   actions: {
@@ -94,6 +112,16 @@ const store = createStore<GlobalDataProps>({
     // 获取专栏页文章内容
     fetchPosts({ commit }, cid) {
       getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+    },
+    // 获取用户信息
+    fetchCurrentUser({ commit }) {
+      getAndCommit('/user/current', 'fetchCurrentUser', commit)
+    },
+    // 组合action(login和fetchCurrentUser)
+    loginAndFetch({ dispatch }, loginData) {
+      return dispatch('login', loginData).then(() => {
+        return dispatch('fetchCurrentUser')
+      })
     }
   },
   getters: {

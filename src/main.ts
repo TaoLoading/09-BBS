@@ -10,12 +10,20 @@ axios.interceptors.request.use(config => {
   config.params = { ...config.params, icode: '15A7028B2AE56E27' }
   // 发起请求时开启loading
   store.commit('setLoading', true)
+  // 重置错误状态
+  store.commit('setError', { status: false, message: '' })
   return config
 })
 axios.interceptors.response.use(config => {
   // 拿到响应时关闭loading
   store.commit('setLoading', false)
   return config
+}, e => {
+  // 错误处理
+  const { error } = e.response.data
+  store.commit('setError', { status: true, message: error })
+  store.commit('setLoading', false)
+  return Promise.reject(error)
 })
 
 // createApp(App).mount('#app')

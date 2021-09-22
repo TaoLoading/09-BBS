@@ -23,6 +23,8 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import ValidateInput, { RulesProp } from '../../components/ValidateInput.vue'
 import ValidateForm from '../../components/ValidateForm.vue'
+import createMessage from '../../components/createMessage'
+
 export default defineComponent({
   name: '',
   props: {
@@ -53,11 +55,11 @@ export default defineComponent({
           password: passwordData.value,
           icode: '15A7028B2AE56E27'
         }
-        store.dispatch('login', params).then(data => {
-          console.log('返回的token是', data.data.token)
+        store.dispatch('loginAndFetch', params).then(() => {
+          createMessage('登陆成功', 'success')
           router.push('/')
-        }).catch(() => {
-          console.log('登陆失败')
+        }).catch(e => {
+          console.log(`登陆失败，原因是：${e}`)
         })
       }
     }
