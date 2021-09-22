@@ -14,8 +14,10 @@ import { emitter } from './ValidateForm.vue'
 
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 interface RuleProp {
-  type: 'required' | 'email'
+  type: 'required' | 'email' | 'custom'
   message: string
+  // 自定义规则函数
+  validator?: () => boolean
 }
 export type RulesProp = RuleProp[]
 export type TagType = 'input' | 'textarea'
@@ -51,9 +53,10 @@ export default defineComponent({
             case 'email':
               passed = emailReg.test(inputRef.val)
               break
-            /* case 'custom':
+              // 自定义规则
+            case 'custom':
               passed = rule.validator ? rule.validator() : true
-              break */
+              break
             default:
               break
           }
