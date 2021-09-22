@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { createStore, Commit } from 'vuex'
-// import { testData, testPosts } from '../testData'
 
 export interface ImageProps {
   _id?: string
