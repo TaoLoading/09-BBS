@@ -1,6 +1,12 @@
 import axios from 'axios'
 import { createStore, Commit } from 'vuex'
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+export interface ResponseType<P = {}> {
+  code: number
+  msg: string
+  data: P
+}
 export interface ImageProps {
   _id?: string
   url?: string
