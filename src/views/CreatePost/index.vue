@@ -60,6 +60,26 @@ export default defineComponent({
         }
       }
     }
+    // 传统上传表单的实现
+    /* const handleFileChange = (e:Event) => {
+      // 获取上传的文件
+      const target = e.target as HTMLInputElement
+      const files = target.files
+      if (files) {
+        const uploadedFile = files[0]
+        // 将文件信息转换为表单信息，以便上传
+        const formData = new FormData()
+        formData.append(uploadedFile.name, uploadedFile)
+        // 上传文件。第三个参数在响应头中设置传递数据的格式
+        axios.post('/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          console.log(res)
+        })
+      }
+    } */
     return {
       titleRules,
       titleVal,
