@@ -135,6 +135,10 @@ const store = createStore<GlobalDataProps>({
       return dispatch('login', loginData).then(() => {
         return dispatch('fetchCurrentUser')
       })
+    },
+    // 创建文章
+    createPost({ commit }, params) {
+      return postAndCommit('/posts', 'createPost', commit, params)
     }
   },
   getters: {

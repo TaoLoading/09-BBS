@@ -11,11 +11,6 @@
         </div>
       </div>
     </section>
-    <upload action="/upload" :beforeUpload="beforeUpload">
-      <template #uploaded="slotProps">
-        <img :src="slotProps.uploadedData.data.url" width="500">
-      </template>
-    </upload>
     <h4 class="font-weight-bold text-center">发现精彩</h4>
     <column-list :list="list"></column-list>
   </div>
@@ -26,13 +21,10 @@ import { computed, defineComponent, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import ColumnList from '../../components/ColumnList.vue'
 import { GlobalDataProps } from '../../store/index'
-import createMessage from '../../components/createMessage'
-import Upload from '../../components/Upload.vue'
 
 export default defineComponent({
   components: {
-    ColumnList,
-    Upload
+    ColumnList
   },
   setup() {
     const store = useStore<GlobalDataProps>()
@@ -41,17 +33,8 @@ export default defineComponent({
     })
     // 拿到store中的columns
     const list = computed(() => store.state.columns)
-    // 校验图片格式的函数
-    const beforeUpload = (file:File) => {
-      const isJPG = (file.type === 'image/jpg' || file.type === 'image/jpeg')
-      if (!isJPG) {
-        createMessage('上传图片只能为jpg或jpeg格式', 'error')
-      }
-      return isJPG
-    }
     return {
-      list,
-      beforeUpload
+      list
     }
   }
 })
