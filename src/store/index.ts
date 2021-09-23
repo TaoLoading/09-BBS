@@ -100,6 +100,13 @@ const store = createStore<GlobalDataProps>({
     // 修改错误状态
     setError(state, e:GlobalErrorProps) {
       state.error = e
+    },
+    // 登出
+    logout(state) {
+      state.token = ''
+      state.user = { isLogin: false }
+      localStorage.remove('token')
+      delete axios.defaults.headers.common.Authorization
     }
   },
   actions: {
