@@ -51,6 +51,7 @@ export interface GlobalDataProps {
 const getAndCommit = async (url:string, mutationName:string, commit:Commit) => {
   const { data } = await axios.get(url)
   commit(mutationName, data)
+  return data
 }
 // post请求函数
 const postAndCommit = async (url:string, mutationName:string, commit:Commit, params:any) => {
@@ -108,19 +109,19 @@ const store = createStore<GlobalDataProps>({
     },
     // 获取首页“发现精彩”内容
     fetchColumns({ commit }) {
-      getAndCommit('/columns', 'fetchColumns', commit)
+      return getAndCommit('/columns', 'fetchColumns', commit)
     },
     // 获取专栏页头部内容
     fetchColumn({ commit }, cid) {
-      getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      return getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
     },
     // 获取专栏页文章内容
     fetchPosts({ commit }, cid) {
-      getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+      return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
     },
     // 获取用户信息
     fetchCurrentUser({ commit }) {
-      getAndCommit('/user/current', 'fetchCurrentUser', commit)
+      return getAndCommit('/user/current', 'fetchCurrentUser', commit)
     },
     // 组合action(login和fetchCurrentUser)
     loginAndFetch({ dispatch }, loginData) {

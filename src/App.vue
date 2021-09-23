@@ -33,15 +33,7 @@ export default defineComponent({
     const store = useStore<GlobalDataProps>()
     const userData = computed(() => store.state.user)
     const isLoading = computed(() => store.state.loading)
-    const token = computed(() => store.state.token)
     const error = computed(() => store.state.error)
-    onMounted(() => {
-      // 当用户未进行登陆操作并且token存在时，发起请求获取用户信息
-      if (!userData.value.isLogin && token.value) {
-        axios.defaults.headers.common.Authorization = `Bearer ${token.value}`
-        store.dispatch('fetchCurrentUser')
-      }
-    })
     // 监视error状态，并根据错误值进行提示
     watch(() => error.value.status, () => {
       const { status, message } = error.value
