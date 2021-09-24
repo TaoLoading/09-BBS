@@ -34,8 +34,10 @@ export default defineComponent({
       type: Function as PropType<CheckFunction>
     }
   },
+  // 声明上传成功和上传失败两个事件
+  emits: ['upload-success', 'upload-error'],
   inheritAttrs: false,
-  setup(props) {
+  setup(props, context) {
     const fileInput = ref<null | HTMLInputElement>(null)
     const fileStatus = ref<UploadStatus>('ready')
     // 上传成功后服务器端返回的数据，用于向父组件中传递
@@ -73,9 +75,13 @@ export default defineComponent({
           fileStatus.value = 'success'
           creatMessage('上传成功', 'success')
           uploadedData.value = res.data
+          // 触发上传成功的事件
+          context.emit('upload-success', res.data)
         }).catch(e => {
           fileStatus.value = 'error'
           creatMessage(`上传失败，原因是：${e}`, 'error')
+          // 触发上传失败的事件
+          context.emit('upload-error', e)
         }).finally(() => {
           // 复原fileInput
           if (fileInput.value) {

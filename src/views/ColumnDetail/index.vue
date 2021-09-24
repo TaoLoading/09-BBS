@@ -34,7 +34,9 @@ export default defineComponent({
     })
     // const column = store.state.columns.find(c => c._id === currentId)
     // const list = store.state.posts.filter(post => post.columnId === currentId)
+    // 获取当前专栏信息
     const column = computed(() => store.getters.getColumnById(currentId))
+    // 获取当前专栏文章
     const list = computed(() => store.getters.getPostsByCid(currentId))
     return {
       column,

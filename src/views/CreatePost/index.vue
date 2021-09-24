@@ -2,7 +2,7 @@
   <div class="create-post-page">
     <h4>新建文章</h4>
     <upload action="/upload" class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
-      :beforeUpload="uploadCheck">
+      :beforeUpload="uploadCheck" @upload-success="handleFileFileUpload">
       <h2>点击上传banner</h2>
       <template #loading>
         <div class="d-flex">
@@ -34,7 +34,7 @@
 import { defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-import { GlobalDataProps, PostProps } from '../../store/index'
+import { GlobalDataProps, PostProps, ResponseType, ImageProps } from '../../store/index'
 import ValidateInput, { RulesProp } from '../../components/ValidateInput.vue'
 import ValidateForm from '../../components/ValidateForm.vue'
 import Upload from '../../components/Upload.vue'
@@ -55,6 +55,7 @@ export default defineComponent({
     const route = useRoute()
     const isEditMode = !!route.query.id
     const store = useStore<GlobalDataProps>()
+    let imgId = ''
     const titleRules: RulesProp = [
       { type: 'required', message: '文章标题不能为空' }
     ]
@@ -62,19 +63,34 @@ export default defineComponent({
     const contentRules: RulesProp = [
       { type: 'required', message: '文章详情不能为空' }
     ]
+    // 上传成功的事件，获取imgId
+    const handleFileFileUpload = (newData:ResponseType<ImageProps>) => {
+      if (newData.data._id) {
+        imgId = newData.data._id
+      }
+    }
+    // 提交文章
     const onFormSubmit = (result: boolean) => {
       if (result) {
-        const { column } = store.state.user
+        const { column, _id } = store.state.user
         if (column) {
           const newPost:PostProps = {
             _id: new Date().getTime().toString(),
             title: titleVal.value,
             content: contentVal.value,
             column,
+            author: _id,
             createdAt: new Date().toLocaleString()
           }
-          store.commit('createPost', newPost)
-          router.push({ name: 'column', params: { id: column } })
+          if (imgId) {
+            newPost.image = imgId
+          }
+          store.dispatch('createPost', newPost).then(() => {
+            createMessage('发表成功，正在跳转到文章专栏页面...', 'success')
+            setTimeout(() => {
+              router.push({ name: 'column', params: { id: column } })
+            }, 2000)
+          })
         }
       }
     }
@@ -118,7 +134,8 @@ export default defineComponent({
       onFormSubmit,
       uploadedData,
       isEditMode,
-      uploadCheck
+      uploadCheck,
+      handleFileFileUpload
     }
   }
 })

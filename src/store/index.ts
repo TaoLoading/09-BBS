@@ -23,9 +23,10 @@ export interface PostProps {
   title: string
   content?: string
   excerpt?: string
-  image?: ImageProps
+  image?: ImageProps | string
   createdAt: string
-  column: string
+  column: string,
+  author?: string
 }
 export interface UserProps {
   isLogin: boolean
