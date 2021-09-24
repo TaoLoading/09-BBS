@@ -11,6 +11,7 @@ export interface ImageProps {
   _id?: string
   url?: string
   createdAt?: string
+  fitUrl?: string
 }
 export interface ColumnProps {
   _id?: string
@@ -25,7 +26,7 @@ export interface PostProps {
   excerpt?: string
   image?: ImageProps | string
   createdAt: string
-  column: string,
+  column: string
   author?: string
 }
 export interface UserProps {
@@ -34,6 +35,7 @@ export interface UserProps {
   _id?: string
   column?: string
   email?: string
+  avatar?: ImageProps
   description?: string
 }
 export interface GlobalErrorProps {
@@ -108,6 +110,9 @@ const store = createStore<GlobalDataProps>({
       state.user = { isLogin: false }
       localStorage.remove('token')
       delete axios.defaults.headers.common.Authorization
+    },
+    fetchPost(state, newData) {
+      state.posts = newData.data
     }
   },
   actions: {
@@ -126,6 +131,10 @@ const store = createStore<GlobalDataProps>({
     // 获取专栏页文章内容
     fetchPosts({ commit }, cid) {
       return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+    },
+    // 获取某一文章内容
+    fetchPost({ commit }, id) {
+      return getAndCommit(`/posts/${id}`, 'fetchPost', commit)
     },
     // 获取用户信息
     fetchCurrentUser({ commit }) {
@@ -148,6 +157,10 @@ const store = createStore<GlobalDataProps>({
     },
     getPostsByCid: (state) => (cid: string) => {
       return state.posts.filter(post => post.column === cid)
+    },
+    getCurrentPost: (state) => (id: string) => {
+      return state.posts
+      return state.posts.filter(post => post._id === id)
     }
   }
 })

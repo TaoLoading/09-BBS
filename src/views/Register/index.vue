@@ -80,7 +80,7 @@ export default defineComponent({
             router.push('/login')
           }, 2000)
         }).catch(e => {
-          console.log(`登陆失败，原因是：${e}`)
+          createMessage(`登录失败，失败原因是${e}`, 'error')
         })
       }
     }

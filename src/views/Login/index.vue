@@ -59,7 +59,7 @@ export default defineComponent({
           createMessage('登陆成功', 'success')
           router.push('/')
         }).catch(e => {
-          console.log(`登陆失败，原因是：${e}`)
+          createMessage(`登录失败，失败原因是${e}`, 'error')
         })
       }
     }
