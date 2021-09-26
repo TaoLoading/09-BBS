@@ -1,8 +1,8 @@
 <template>
   <div class="create-post-page">
-    <h4>新建文章</h4>
+    <h4>{{isEdit ? '编辑文章' : '新建文章'}}</h4>
     <upload action="/upload" class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
-      :beforeUpload="uploadCheck" @upload-success="handleFileFileUpload">
+      :beforeUpload="uploadCheck" @upload-success="handleFileFileUpload" :uploaded="uploadedData">
       <h2>点击上传banner</h2>
       <template #loading>
         <div class="d-flex">
@@ -24,14 +24,14 @@
         <validate-input rows="10" tag="textarea" placeholder="请输入文章详情" :rules="contentRules" v-model="contentVal"/>
       </div>
       <template #submit>
-        <button class="btn btn-primary btn-large">发表文章</button>
+        <button class="btn btn-primary btn-large">{{isEdit ? '更新文章' : '发表文章'}}</button>
       </template>
     </validate-form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import { GlobalDataProps, PostProps, ResponseType, ImageProps } from '../../store/index'
@@ -42,7 +42,6 @@ import { beforeUploadCheck } from '../../hook/helper'
 import createMessage from '../../components/createMessage'
 
 export default defineComponent({
-  name: 'Login',
   components: {
     ValidateInput,
     ValidateForm,
@@ -53,7 +52,8 @@ export default defineComponent({
     const titleVal = ref('')
     const router = useRouter()
     const route = useRoute()
-    const isEditMode = !!route.query.id
+    // 通过类型转换判断是否是编辑状态
+    const isEdit = !!route.query.id
     const store = useStore<GlobalDataProps>()
     let imgId = ''
     const titleRules: RulesProp = [
@@ -69,6 +69,19 @@ export default defineComponent({
         imgId = newData.data._id
       }
     }
+    onMounted(() => {
+      // 当处于编辑状态时，异步获取当前被编辑文章的数据填充到页面中
+      if (isEdit) {
+        store.dispatch('fetchPost', route.query.id).then((newData:ResponseType<PostProps>) => {
+          const currentPost = newData.data
+          if (currentPost.image) {
+            uploadedData.value = { data: currentPost.image }
+          }
+          titleVal.value = currentPost.title
+          contentVal.value = currentPost.content || ''
+        })
+      }
+    })
     // 提交文章
     const onFormSubmit = (result: boolean) => {
       if (result) {
@@ -85,7 +98,12 @@ export default defineComponent({
           if (imgId) {
             newPost.image = imgId
           }
-          store.dispatch('createPost', newPost).then(() => {
+          const actionName = isEdit ? 'updatePost' : 'createPost'
+          const sendData = isEdit ? {
+            id: route.query.id,
+            params: newPost
+          } : newPost
+          store.dispatch(actionName, sendData).then(() => {
             createMessage('发表成功，正在跳转到文章专栏页面...', 'success')
             setTimeout(() => {
               router.push({ name: 'column', params: { id: column } })
@@ -133,7 +151,7 @@ export default defineComponent({
       contentRules,
       onFormSubmit,
       uploadedData,
-      isEditMode,
+      isEdit,
       uploadCheck,
       handleFileFileUpload
     }

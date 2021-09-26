@@ -9,8 +9,13 @@
         </div>
         <span class="text-muted col text-right font-italic">发表于：{{currentPost.createdAt}}</span>
       </div>
-      <!-- (TODO)  v-html解析HTML失效，展示的还是HTML代码 -->
       <div v-html="currentHTML"></div>
+      <div v-if="showEditArea" class="btn-group mt-5">
+        <router-link type="button" class="btn btn-success" :to="{name: 'create', query: { id: currentPost._id}}">
+          编辑
+        </router-link>
+        <!-- <button type="button" class="btn btn-danger" @click.prevent="modalIsVisible = true">删除</button> -->
+      </div>
     </article>
   </div>
 </template>
@@ -36,13 +41,15 @@ export default defineComponent({
       store.dispatch('fetchPost', currentId)
     })
     const currentPost = computed<PostProps>(() => store.getters.getCurrentPost(currentId))
+    // console.log('currentPost是', currentPost)
+    // 将md语法转换为html代码
     // eslint-disable-next-line vue/return-in-computed-property
     const currentHTML = computed(() => {
       if (currentPost.value && currentPost.value.content) {
         return md.render(currentPost.value.content)
       }
     })
-    console.log('currentHTML是', currentHTML)
+    // 获取banner图
     const currentImageUrl = computed(() => {
       if (currentPost.value && currentPost.value.image) {
         const { image } = currentPost.value
@@ -51,10 +58,22 @@ export default defineComponent({
         return null
       }
     })
+    // 根据比对文章id和登录id判断编辑区域是否显示
+    const showEditArea = computed(() => {
+      const { isLogin, _id } = store.state.user
+      if (currentPost.value && currentPost.value.author && isLogin) {
+        // 对author属性进阶类型断言，强制为UserProps
+        const postAuthor = currentPost.value.author as UserProps
+        return postAuthor._id === _id
+      } else {
+        return false
+      }
+    })
     return {
       currentPost,
       currentHTML,
-      currentImageUrl
+      currentImageUrl,
+      showEditArea
     }
   }
 })

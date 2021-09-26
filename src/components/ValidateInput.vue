@@ -1,15 +1,15 @@
 <template>
     <div class="validate-input-container pb-3">
-      <input v-if="tag!='textarea'" class="form-control" :value="inputRef.val"
-        @input="updateValue" @blur="validateInput" :class="{'is-invalid': inputRef.error}" v-bind="$attrs">
-      <textarea v-else class="form-control" :value="inputRef.val"
-        @input="updateValue" @blur="validateInput" :class="{'is-invalid': inputRef.error}" v-bind="$attrs"></textarea>
+      <input v-if="tag!='textarea'" class="form-control" v-model="inputRef.val" @blur="validateInput"
+        :class="{'is-invalid': inputRef.error}" v-bind="$attrs">
+      <textarea v-else class="form-control" v-model="inputRef.val"
+        @blur="validateInput" :class="{'is-invalid': inputRef.error}" v-bind="$attrs"></textarea>
       <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, PropType, onMounted } from 'vue'
+import { defineComponent, reactive, PropType, onMounted, computed } from 'vue'
 import { emitter } from './ValidateForm.vue'
 
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
@@ -36,7 +36,12 @@ export default defineComponent({
   inheritAttrs: false,
   setup(props, context) {
     const inputRef = reactive({
-      val: props.modelValue || '',
+      val: computed({
+        get: () => props.modelValue || '',
+        set: val => {
+          context.emit('update:modelValue', val)
+        }
+      }),
       error: false,
       message: ''
     })
@@ -67,19 +72,19 @@ export default defineComponent({
       }
       return true
     }
-    // 通过自定义v-model的方式更新输入的值
+    /* // 通过自定义v-model的方式更新输入的值
     const updateValue = (e:KeyboardEvent) => {
       const targetValue = (e.target as HTMLInputElement).value
       inputRef.val = targetValue
+      // 向外发送更新的事件，值为targetValue
       context.emit('update:modelValue', targetValue)
-    }
+    } */
     onMounted(() => {
       emitter.emit('form-item-created', validateInput)
     })
     return {
       inputRef,
-      validateInput,
-      updateValue
+      validateInput
     }
   }
 })

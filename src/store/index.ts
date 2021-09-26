@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { createStore, Commit } from 'vuex'
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -19,16 +19,6 @@ export interface ColumnProps {
   avatar?: ImageProps
   description: string
 }
-export interface PostProps {
-  _id: string
-  title: string
-  content?: string
-  excerpt?: string
-  image?: ImageProps | string
-  createdAt: string
-  column: string
-  author?: string
-}
 export interface UserProps {
   isLogin: boolean
   nickName?: string
@@ -37,6 +27,16 @@ export interface UserProps {
   email?: string
   avatar?: ImageProps
   description?: string
+}
+export interface PostProps {
+  _id: string
+  title: string
+  content?: string
+  excerpt?: string
+  image?: ImageProps | string
+  createdAt: string
+  column: string
+  author?: string | UserProps
 }
 export interface GlobalErrorProps {
   status: boolean
@@ -50,15 +50,9 @@ export interface GlobalDataProps {
   posts: PostProps[]
   user: UserProps
 }
-// get请求函数
-const getAndCommit = async (url:string, mutationName:string, commit:Commit) => {
-  const { data } = await axios.get(url)
-  commit(mutationName, data)
-  return data
-}
-// post请求函数
-const postAndCommit = async (url:string, mutationName:string, commit:Commit, params:any) => {
-  const { data } = await axios.post(url, params)
+// 发起访问请求函数(组合get/post等请求)
+const asyncAndCommit = async (url:string, mutationName:string, commit:Commit, config:AxiosRequestConfig = { method: 'get' }) => {
+  const { data } = await axios(url, config)
   commit(mutationName, data)
   return data
 }
@@ -113,32 +107,46 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPost(state, newData) {
       state.posts = newData.data
+    },
+    updatePost(state, { data }) {
+      // console.log('state.posts的类型是', typeof state.posts)
+      // console.log('state.posts是', state.posts)
+      state.posts = state.posts.map(post => {
+        if (post._id === data.id) {
+          return data
+        } else {
+          return post
+        }
+      })
     }
   },
   actions: {
     // 登录
     login({ commit }, params) {
-      return postAndCommit('/user/login', 'login', commit, params)
+      return asyncAndCommit('/user/login', 'login', commit, {
+        method: 'post',
+        data: params
+      })
     },
     // 获取首页“发现精彩”内容
     fetchColumns({ commit }) {
-      return getAndCommit('/columns', 'fetchColumns', commit)
+      return asyncAndCommit('/columns', 'fetchColumns', commit)
     },
     // 获取专栏页头部内容
     fetchColumn({ commit }, cid) {
-      return getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
     },
     // 获取专栏页文章内容
     fetchPosts({ commit }, cid) {
-      return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+      return asyncAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
     },
     // 获取某一文章内容
     fetchPost({ commit }, id) {
-      return getAndCommit(`/posts/${id}`, 'fetchPost', commit)
+      return asyncAndCommit(`/posts/${id}`, 'fetchPost', commit)
     },
     // 获取用户信息
     fetchCurrentUser({ commit }) {
-      return getAndCommit('/user/current', 'fetchCurrentUser', commit)
+      return asyncAndCommit('/user/current', 'fetchCurrentUser', commit)
     },
     // 组合action(login和fetchCurrentUser)
     loginAndFetch({ dispatch }, loginData) {
@@ -146,9 +154,19 @@ const store = createStore<GlobalDataProps>({
         return dispatch('fetchCurrentUser')
       })
     },
-    // 创建文章
+    // 新建文章
     createPost({ commit }, params) {
-      return postAndCommit('/posts', 'createPost', commit, params)
+      return asyncAndCommit('/posts', 'createPost', commit, {
+        method: 'post',
+        data: params
+      })
+    },
+    // 更新文章
+    updatePost({ commit }, { id, params }) {
+      return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {
+        method: 'patch',
+        data: params
+      })
     }
   },
   getters: {
@@ -156,6 +174,7 @@ const store = createStore<GlobalDataProps>({
       return state.columns.find(c => c._id === id)
     },
     getPostsByCid: (state) => (cid: string) => {
+      // console.log('state.posts是', state.posts)
       return state.posts.filter(post => post.column === cid)
     },
     getCurrentPost: (state) => (id: string) => {
