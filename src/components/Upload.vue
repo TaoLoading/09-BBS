@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, PropType, ref, watch } from 'vue'
 import axios from 'axios'
 import creatMessage from './createMessage'
 
@@ -32,6 +32,10 @@ export default defineComponent({
     },
     beforeUpload: {
       type: Function as PropType<CheckFunction>
+    },
+    // 上传已完成，用于编辑文章时获取数据
+    uploaded: {
+      type: Object
     }
   },
   // 声明上传成功和上传失败两个事件
@@ -39,9 +43,17 @@ export default defineComponent({
   inheritAttrs: false,
   setup(props, context) {
     const fileInput = ref<null | HTMLInputElement>(null)
-    const fileStatus = ref<UploadStatus>('ready')
+    // 上传状态
+    const fileStatus = ref<UploadStatus>(props.uploaded ? 'success' : 'ready')
     // 上传成功后服务器端返回的数据，用于向父组件中传递
-    const uploadedData = ref()
+    const uploadedData = ref(props.uploaded)
+    // 监视服务器返回的数据，当上传完成后获取上传的数据
+    watch(() => props.uploaded, (newData) => {
+      if (newData) {
+        fileStatus.value = 'success'
+        uploadedData.value = newData
+      }
+    })
     // 点击上传
     const triggerUpload = () => {
       if (fileInput.value) {
