@@ -118,6 +118,9 @@ const store = createStore<GlobalDataProps>({
           return post
         }
       })
+    },
+    deletePost(state, { data }) {
+      state.posts = state.posts.filter(post => post._id !== data._id)
     }
   },
   actions: {
@@ -167,6 +170,13 @@ const store = createStore<GlobalDataProps>({
         method: 'patch',
         data: params
       })
+    },
+    // 删除文章
+    deletePost({ commit }, id) {
+      return asyncAndCommit(`/posts/${id}`, 'deletePost', commit, {
+        method: 'delete',
+        data: id
+      })
     }
   },
   getters: {
@@ -179,7 +189,7 @@ const store = createStore<GlobalDataProps>({
     },
     getCurrentPost: (state) => (id: string) => {
       return state.posts
-      return state.posts.filter(post => post._id === id)
+      return state.posts.find(post => post._id === id)
     }
   }
 })

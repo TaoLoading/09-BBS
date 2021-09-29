@@ -103,6 +103,7 @@ export default defineComponent({
             id: route.query.id,
             params: newPost
           } : newPost
+          // (TODO) 新建文章时存在错误，服务器报错：icode不能为空，参数加上icode后服务器报错500
           store.dispatch(actionName, sendData).then(() => {
             createMessage('发表成功，正在跳转到文章专栏页面...', 'success')
             setTimeout(() => {

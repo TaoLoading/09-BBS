@@ -1,6 +1,6 @@
 <template>
   <div class="post-detail-page">
-    <modal title="删除文章" :visible="modalIsVisible" @modal-on-close="modalIsVisible = false" @modal-on-confirm="modalIsVisible = false">
+    <modal title="删除文章" :visible="modalIsVisible" @modal-on-close="modalIsVisible = false" @modal-on-confirm="deletePosts">
       <p>确定删除该文章吗？</p>
     </modal>
     <article class="w-75 mx-auto mb-5 pb-3" v-if="currentPost">
@@ -40,6 +40,7 @@ export default defineComponent({
   setup() {
     const store = useStore<GlobalDataProps>()
     const route = useRoute()
+    const router = useRouter()
     const modalIsVisible = ref(false)
     const currentId = route.params.id
     const md = new MarkdownIt()
@@ -75,12 +76,26 @@ export default defineComponent({
         return false
       }
     })
+    // 删除文章
+    const deletePosts = () => {
+      modalIsVisible.value = false
+      // (TODO) 点击删除后，文章已成功删除，服务器返回200，但没有进入then，而是catch捕获
+      store.dispatch('deletePost', currentId).then((newData: ResponseType<PostProps>) => {
+        createMessage('删除成功，2秒后跳转到专栏首页', 'success')
+        setTimeout(() => {
+          router.push({ name: 'column', params: { id: newData.data.column } })
+        }, 2000)
+      }).catch(() => {
+        createMessage('删除失败', 'error')
+      })
+    }
     return {
       currentPost,
       currentHTML,
       currentImageUrl,
       showEditArea,
-      modalIsVisible
+      modalIsVisible,
+      deletePosts
     }
   }
 })
