@@ -10,6 +10,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue'
+import useDOMCreate from '../hook/useDOMCreate'
 export type MessageType = 'success' | 'error' | 'default'
 
 export default defineComponent({
@@ -22,10 +23,7 @@ export default defineComponent({
   },
   emits: ['close-message'],
   setup(props, context) {
-    // 添加节点
-    const node = document.createElement('div')
-    node.id = 'message'
-    document.body.appendChild(node)
+    useDOMCreate('message')
     const isVisible = ref(true)
     // 自定义Message的类型
     const classObject = {
