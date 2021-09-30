@@ -56,7 +56,7 @@ const asyncAndCommit = async (url:string, mutationName:string, commit:Commit, co
   commit(mutationName, data)
   return data
 }
-const store = createStore<GlobalDataProps>({
+export const store = createStore<GlobalDataProps>({
   state: {
     error: { status: false },
     token: localStorage.getItem('token') || '',
@@ -180,13 +180,15 @@ const store = createStore<GlobalDataProps>({
     }
   },
   getters: {
+    // 获取当前专栏信息
     getColumnById: (state) => (id: string) => {
       return state.columns.find(c => c._id === id)
     },
+    // 获取当前专栏内文章
     getPostsByCid: (state) => (cid: string) => {
-      // console.log('state.posts是', state.posts)
       return state.posts.filter(post => post.column === cid)
     },
+    // 获取当前文章
     getCurrentPost: (state) => (id: string) => {
       return state.posts
       return state.posts.find(post => post._id === id)

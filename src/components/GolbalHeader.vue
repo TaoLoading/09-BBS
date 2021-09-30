@@ -18,11 +18,11 @@
           <dropdown-item>
             <router-link :to="`/column/${user.column}`" class="dropdown-item">我的专栏</router-link>
           </dropdown-item>
-          <dropdown-item>
+          <!-- <dropdown-item>
             <a href="#" class="dropdown-item">编辑资料</a>
-          </dropdown-item>
+          </dropdown-item> -->
           <dropdown-item>
-            <a href="#" class="dropdown-item">退出登录</a>
+            <span class="dropdown-item" @click="logout">退出登录</span>
           </dropdown-item>
         </dropdown>
       </li>
@@ -45,6 +45,15 @@ export default defineComponent({
     user: {
       type: Object as PropType<UserProps>,
       required: true
+    }
+  },
+  setup() {
+    const logout = () => {
+      localStorage.removeItem('token')
+      location.reload()
+    }
+    return {
+      logout
     }
   }
 })
