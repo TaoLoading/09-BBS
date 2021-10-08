@@ -38,7 +38,6 @@ export default defineComponent({
     const column = computed(() => store.getters.getColumnById(currentId))
     // 获取当前专栏文章
     const list = computed(() => store.getters.getPostsByCid(currentId))
-    // console.log('list是', list)
     return {
       column,
       list

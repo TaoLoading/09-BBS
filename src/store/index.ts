@@ -106,11 +106,9 @@ export const store = createStore<GlobalDataProps>({
       delete axios.defaults.headers.common.Authorization
     },
     fetchPost(state, newData) {
-      state.posts = newData.data
+      state.posts = [newData.data]
     },
     updatePost(state, { data }) {
-      // console.log('state.posts的类型是', typeof state.posts)
-      // console.log('state.posts是', state.posts)
       state.posts = state.posts.map(post => {
         if (post._id === data.id) {
           return data
@@ -190,7 +188,6 @@ export const store = createStore<GlobalDataProps>({
     },
     // 获取当前文章
     getCurrentPost: (state) => (id: string) => {
-      return state.posts
       return state.posts.find(post => post._id === id)
     }
   }

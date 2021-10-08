@@ -48,7 +48,6 @@ export default defineComponent({
       store.dispatch('fetchPost', currentId)
     })
     const currentPost = computed<PostProps>(() => store.getters.getCurrentPost(currentId))
-    // console.log('currentPost是', currentPost)
     // 将md语法转换为html代码
     // eslint-disable-next-line vue/return-in-computed-property
     const currentHTML = computed(() => {
