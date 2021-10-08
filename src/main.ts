@@ -7,7 +7,7 @@ import store from './store/index'
 axios.defaults.baseURL = 'http://apis.imooc.com/api/'
 axios.interceptors.request.use(config => {
   // 配置后端访问码
-  config.params = { ...config.params, icode: '15A7028B2AE56E27' }
+  config.params = { ...config.params, icode: '38CD209A8A08B4B6' }
   // 发起请求时开启loading
   store.commit('setLoading', true)
   // 重置错误状态
