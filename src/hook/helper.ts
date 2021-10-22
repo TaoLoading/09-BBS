@@ -48,12 +48,6 @@ export function addColumnAvatar(data: ColumnProps | UserProps, width: number, he
   }
 }
 
-interface TestProps {
-  _id:string
-  name:string
-}
-const testData:TestProps[] = [{ _id: '1', name: 'xm' }, { _id: '2', name: 'xw' }]
-
 // 将数组转化为可索引的对象
 export const arrToObj = <T extends { _id?:string }>(arr:Array<T>) => {
   return arr.reduce((prev, current) => {
@@ -63,9 +57,6 @@ export const arrToObj = <T extends { _id?:string }>(arr:Array<T>) => {
     return prev
   }, {} as {[key:string]:T})
 }
-
-const result = arrToObj(testData)
-console.log(result)
 
 // 将可以索引的对象转换为数组
 export const objToArr = <T>(obj: {[key:string]:T}) => {
