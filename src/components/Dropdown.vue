@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
-import useClickOutside from '../hook/useCilckOutside'
+import useClickOutside from '../hook/useClickOutside'
 export default defineComponent({
   name: 'Dropdown',
   props: {
